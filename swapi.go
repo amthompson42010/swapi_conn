@@ -28,7 +28,8 @@ type Person struct {
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
-	url := "https://swapi.dev/api/people/1"
+	vars := mux.Vars(r)
+	url := "https://swapi.dev/api/people/" + vars["id"]
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -58,7 +59,7 @@ func homePage(w http.ResponseWriter, r *http.Request) {
 
 func handleRequests() {
 	myRouter := mux.NewRouter().StrictSlash(true)
-	myRouter.HandleFunc("/", homePage)
+	myRouter.HandleFunc("/{id}", homePage)
 	http.ListenAndServe(":8080", myRouter)
 }
 
