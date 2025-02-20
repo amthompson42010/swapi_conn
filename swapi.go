@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"io/ioutil"
+	"github.com/gorilla/mux"
 )
 
 type Person struct {
@@ -26,7 +27,7 @@ type Person struct {
 	URL       string   `json:"url"`
 }
 
-func main() {
+func homePage(w http.ResponseWriter, r *http.Request) {
 	url := "https://swapi.dev/api/people/1"
 
 	resp, err := http.Get(url)
@@ -43,13 +44,32 @@ func main() {
 	}
 
 	var person Person
+	
 	err = json.Unmarshal(body, &person)
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
-	fmt.Printf("Name: %s\n", person.Name)
-	fmt.Printf("Height: %s\n", person.Height)
-	fmt.Printf("Mass: %s\n", person.Mass)
+	fmt.Fprintf(w, "Name: %s\n", person.Name)
+	fmt.Fprintf(w, "Height: %s\n", person.Height)
+	fmt.Fprintf(w, "Mass: %s\n", person.Mass)
+}
+
+func handleRequests() {
+	myRouter := mux.NewRouter().StrictSlash(true)
+	myRouter.HandleFunc("/", homePage)
+	http.ListenAndServe(":8080", myRouter)
+}
+
+func main() {
+	
+
+	fmt.Println("Server listening on port 8080...")
+	handleRequests()
+	
+
+	// fmt.Printf("Name: %s\n", person.Name)
+	// fmt.Printf("Height: %s\n", person.Height)
+	// fmt.Printf("Mass: %s\n", person.Mass)
 }
